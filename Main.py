@@ -53,6 +53,8 @@ def leave_one_out_cross_validation(data, current_set, feature_to_add):
 
     accuracy = number_correctly_classfied = number_correctly_classified /size(data,1)
 
+    return accuracy
+
 
 
 
@@ -76,25 +78,91 @@ for i 1: size(data,2) -1
 
 def feature_search(data):
 
+    print("Beginning search. ")
+
+
+    best_accuracy_feature_set = set()
+    best_accuracy_of_program = 0
     current_set = set()
 
-    for i in range(1, data.shape[1]- 1):
+    for i in range(1, data.shape[1]): #shape return row and column
 
-        print(f"On the {i}th level of the search tree")
-        feature_to_add_at_this_level = set()
+        # print(f"On the {i}th level of the search tree")
+        feature_to_add_at_this_level = None
         best_accuracy = 0
 
-        for j in range(data.shape[1] -1):
-            if num2str(j) not in current_set:
-                print(f"--Considering adding the {num2str[j]} feature")
-                accuracy = leave_one_out_cross_validation(data, current_set, feature_to_add_at_this_level.pop(0))
+        """
+        Here let's keep the data aside 
+        
+        Let's assume the k fold validation return correct accuracy for the features we are passing and
+        checks with the data.
+        
+        So the job of this function is to keep track of the features respect to the accuracy
+        
+        But here it's taking the element of our data rather than "what" the feature is?
+        
+        So is the k-fold validation knowing what feature we used based on the column or?
+        
+        
+        
+        """
 
-                if accuracy > best_accuracy:
+        for j in range(1, data.shape[1]):
+
+            if j not in current_set:
+
+                accuracy = leave_one_out_cross_validation(data, current_set, j+1)
+
+                #TO IMPLEMENT {...} figuring out a way to print all the features that are currently being used.
+                #Elements from current set + J in ordered form
+                # I'm thinking maybe first collect all the feature in another list and print them in sorted order.
+
+
+                print(f"Using feature(s) {...} accuracy is {accuracy}%")
+                ''''
+                what does j+1 do here
+                
+                Let's assume accuracy still returns the correct value 
+                
+                '''
+
+                if accuracy > best_accuracy: #Checking best feature at this level
                     best_accuracy = accuracy
-                    feature_to_add_at_this_level = k
+                    feature_to_add_at_this_level = j
 
-        current_set_of_features[i] = feature_to_add_at_this_level
-        print(f"On this level {num2str[i]} i added feature, {num2str(feature_to_add_at_this_level)}")
+                if best_accuracy_of_program < accuracy: #Checking if this is the best set of features
+                    best_accuracy_of_program = accuracy
+                    best_accuracy_feature_set = current_set
+
+                # THROW A WARNING IF ACCURACY DROPS FROM THE BEST OF THE PROGRAM ACCURACY  -------  DONE
+                if accuracy < best_accuracy_of_program: #Checks if the accuracy decreased with added feature
+                    print(f"Warning, Accuracy has decreased! Continuing search in case of local maxima")
+
+
+                    ''''
+                    Since we are adding only only feature at every level, does feature to add at this level need to be a 
+                    set? Or am I missing something?
+                    So I changed it to int rather than set
+                    
+                    '''
+
+
+
+        #TO IMPLEMENT NEED TO KEEP TRACK OF THE BEST ACCURACY OF PROGRAM AND THE FEATURE --- DONE
+
+        #AND PRINT WHICH FEATURE SET WAS THE BEST IN EACH LEVEL
+
+        #Here I'm thinking to implement add elements from current_set and feature to add at this level to a list, sort them and print them with best_accuracy
+
+
+        print(f"Feature set {...} was the best, accuracy is {best_accuracy}%")
+
+
+
+
+
+        current_set.add(feature_to_add_at_this_level)
+        print(f"On this level {i} i added feature, {feature_to_add_at_this_level}.")
 
 
 
