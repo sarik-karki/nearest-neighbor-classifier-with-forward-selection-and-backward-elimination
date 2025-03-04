@@ -81,88 +81,48 @@ def feature_search(data):
     print("Beginning search. ")
 
 
-    best_accuracy_feature_set = set()
-    best_accuracy_of_program = 0
-    current_set = set()
+    best_accuracy_feature_set = set()               #Keep track of the best found feature set
+    best_accuracy_of_program = 0                    #Keep track of the best accuracy of the program
+    current_set = set()                             #Set of features as we keep on adding features
 
     for i in range(1, data.shape[1]): #shape return row and column
 
-        # print(f"On the {i}th level of the search tree")
-        feature_to_add_at_this_level = None
-        best_accuracy = 0
-
-        """
-        Here let's keep the data aside 
-        
-        Let's assume the k fold validation return correct accuracy for the features we are passing and
-        checks with the data.
-        
-        So the job of this function is to keep track of the features respect to the accuracy
-        
-        But here it's taking the element of our data rather than "what" the feature is?
-        
-        So is the k-fold validation knowing what feature we used based on the column or?
-        
-        
-        
-        """
+        feature_to_add_at_this_level = None         #Find best feature at each level
+        best_accuracy = 0                           #Keep track of the best accuracy at each level
 
         for j in range(1, data.shape[1]):
+            feature_used = set() #List of feature that were just tested
 
             if j not in current_set:
 
-                accuracy = leave_one_out_cross_validation(data, current_set, j+1)
+                accuracy = leave_one_out_cross_validation(data, current_set, j)
 
-                #TO IMPLEMENT {...} figuring out a way to print all the features that are currently being used.
-                #Elements from current set + J in ordered form
-                # I'm thinking maybe first collect all the feature in another list and print them in sorted order.
+                #To print which feature is being used
+                feature_used = current_set
+                feature_used.add(j)
 
 
-                print(f"Using feature(s) {...} accuracy is {accuracy}%")
-                ''''
-                what does j+1 do here
-                
-                Let's assume accuracy still returns the correct value 
-                
-                '''
+                print(f"Using feature(s) {sorted(feature_used)} accuracy is {accuracy}%")     #Print what features are being used
 
-                if accuracy > best_accuracy: #Checking best feature at this level
+                # Checking best feature at this level
+                if accuracy > best_accuracy:
                     best_accuracy = accuracy
                     feature_to_add_at_this_level = j
 
-                if best_accuracy_of_program < accuracy: #Checking if this is the best set of features
+                # Checking if this is the best set of features
+                if best_accuracy_of_program < accuracy:
                     best_accuracy_of_program = accuracy
                     best_accuracy_feature_set = current_set
 
-                # THROW A WARNING IF ACCURACY DROPS FROM THE BEST OF THE PROGRAM ACCURACY  -------  DONE
-                if accuracy < best_accuracy_of_program: #Checks if the accuracy decreased with added feature
+                # Checks if the accuracy decreased with added feature
+                if accuracy < best_accuracy_of_program:
                     print(f"Warning, Accuracy has decreased! Continuing search in case of local maxima")
 
 
-                    ''''
-                    Since we are adding only only feature at every level, does feature to add at this level need to be a 
-                    set? Or am I missing something?
-                    So I changed it to int rather than set
-                    
-                    '''
+        current_set.add(feature_to_add_at_this_level)                   #Add the best feature to current_set
+        print(f"Feature set {sorted(current_set)} was the best, accuracy is {best_accuracy}%")                  #Print the best found features at this level
 
-
-
-        #TO IMPLEMENT NEED TO KEEP TRACK OF THE BEST ACCURACY OF PROGRAM AND THE FEATURE --- DONE
-
-        #AND PRINT WHICH FEATURE SET WAS THE BEST IN EACH LEVEL
-
-        #Here I'm thinking to implement add elements from current_set and feature to add at this level to a list, sort them and print them with best_accuracy
-
-
-        print(f"Feature set {...} was the best, accuracy is {best_accuracy}%")
-
-
-
-
-
-        current_set.add(feature_to_add_at_this_level)
-        print(f"On this level {i} i added feature, {feature_to_add_at_this_level}.")
+    print(f"Finished search!! The best feature subset is {sorted(best_accuracy_feature_set)} , which has an accuracy of {best_accuracy_of_program}%")
 
 
 
