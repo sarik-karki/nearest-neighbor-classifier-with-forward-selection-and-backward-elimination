@@ -29,8 +29,9 @@ def leave_one_out_cross_validation(data, current_set, feature_to_add):
 
     number_correctly_classified = 0
     # shape return row, colum
-    for i in range(1, data.shape[0]): #This loops over all the rows
-        object_to_classify = data[i, 1:]      #Current row and get all column except the 0th
+    for i in range(1, data.shape[0]):         #This loops over all the rows
+
+        object_to_classify = data[i, 2:]      #Current row and get all column except the 0th
         label_object_to_classify = data[i][0] #First item to the row -- Given object
 
 
@@ -39,7 +40,16 @@ def leave_one_out_cross_validation(data, current_set, feature_to_add):
 
         for j  in range(1, data.shape[0]):
             if j != i:
-                distance  = sqrt((sum((object_to_classify - data[k, 1:])))
+
+                # distance  = sqrt((sum((object_to_classify - data[j, 2:])))
+
+                distance = 0
+                for k in range(2, data.shape[1]):
+                    distance +=  (data.shape[j][k] - data.shape[i][k]) ** 2
+                distance = distance ** 0.5
+
+
+
                 if distance < nearest_neighbor_distance:
                     nearest_neighbor_distance = distance
                     nearest_neighbor_location = j
@@ -47,13 +57,13 @@ def leave_one_out_cross_validation(data, current_set, feature_to_add):
 
 
 
-        if label_object_to_classify == nearest_neightbor_label:
-            number_correctly_classified = number_correctly_classified + 1
+            if label_object_to_classify == nearest_neightbor_label:
+                number_correctly_classified = number_correctly_classified + 1
 
 
-    accuracy = number_correctly_classfied = number_correctly_classified /size(data,1)
+        accuracy = number_correctly_classfied = number_correctly_classified /size(data,1)
 
-    return accuracy
+        return accuracy
 
 
 
@@ -76,7 +86,7 @@ for i 1: size(data,2) -1
 
 
 
-def feature_search(data):
+def forward_feature_search(data):
 
     print("Beginning search. ")
 
