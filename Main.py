@@ -24,46 +24,47 @@ end
 """
 
 def leave_one_out_cross_validation(data, current_set, feature_to_add):
-    data = np.loadtxt(data)
 
+    data_copy = data.copy()
+    for remove_column in range(1, data_copy.shape[1]):
+        if remove_column not in current_set and remove_column != feature_to_add:
+            data_copy[:, remove_column] = 0
 
     number_correctly_classified = 0
     # shape return row, colum
-    for i in range(1, data.shape[0]):         #This loops over all the rows
+    for i in range(1, data_copy.shape[0]):         #This loops over all the rows
 
-        object_to_classify = data[i, 2:]      #Current row and get all column except the 0th
-        label_object_to_classify = data[i][0] #First item to the row -- Given object
+        object_to_classify = data_copy[i, 1:]      #Current row and get all column except the 0th
+        label_object_to_classify = data_copy[i][0] #First item to the row -- Given object
 
 
         nearest_neighbor_distance = float('inf')
         nearest_neighbor_location = float('inf')
+        nearest_neighbor_label = ""
 
-        for j  in range(1, data.shape[0]):
+        for j  in range(1, data_copy.shape[0]):
             if j != i:
 
-                # distance  = sqrt((sum((object_to_classify - data[j, 2:])))
-
                 distance = 0
-                for k in range(2, data.shape[1]):
-                    distance +=  (data.shape[j][k] - data.shape[i][k]) ** 2
+                for k in range(1, data_copy.shape[1]):
+                    distance +=  (data_copy[j][k] - data_copy[i][k]) ** 2
                 distance = distance ** 0.5
-
 
 
                 if distance < nearest_neighbor_distance:
                     nearest_neighbor_distance = distance
                     nearest_neighbor_location = j
-                    nearest_neighbor_label = data[nearest_neighbor_location][0]
+                    nearest_neighbor_label = data_copy[nearest_neighbor_location][0]
 
 
 
-            if label_object_to_classify == nearest_neightbor_label:
-                number_correctly_classified = number_correctly_classified + 1
+        if label_object_to_classify == nearest_neighbor_label:
+            number_correctly_classified += 1
 
 
-        accuracy = number_correctly_classfied = number_correctly_classified /size(data,1)
+    accuracy = number_correctly_classified /data_copy.shape[0]
 
-        return accuracy
+    return accuracy
 
 
 
@@ -87,7 +88,6 @@ for i 1: size(data,2) -1
 
 
 def forward_feature_search(data):
-
     print("Beginning search. ")
 
 
@@ -108,7 +108,7 @@ def forward_feature_search(data):
                 accuracy = leave_one_out_cross_validation(data, current_set, j)
 
                 #To print which feature is being used
-                feature_used = current_set
+                feature_used = current_set.copy()
                 feature_used.add(j)
 
 
@@ -122,7 +122,8 @@ def forward_feature_search(data):
                 # Checking if this is the best set of features
                 if best_accuracy_of_program < accuracy:
                     best_accuracy_of_program = accuracy
-                    best_accuracy_feature_set = current_set
+                    best_accuracy_feature_set = current_set.copy()
+                    best_accuracy_feature_set.add(j)
 
                 # Checks if the accuracy decreased with added feature
                 if accuracy < best_accuracy_of_program:
@@ -138,13 +139,18 @@ def forward_feature_search(data):
 
 def main():
     print("Welcome to Feature Search Algorithm.")
-    inputFile = input(print("Type in the name of the file to test: "))
-
+    inputFile = "/Users/eros/Library/Mobile Documents/com~apple~CloudDocs/project_2/CS170_Large_Data__92.txt"
     print()
-    print("Type the number of the algorithm you want to run.")
+    algorithm_type = input("Type the number of the algorithm you want to run.")
     print()
     print("     1)Forward Selection")
     print("     2)Backward Selection")
+
+    data = np.loadtxt(inputFile)
+
+    if algorithm_type == "1":
+        forward_feature_search(data)
+
 
 
 
