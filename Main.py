@@ -2,29 +2,6 @@ import time
 
 import numpy as np
 
-# On the ith level of the search tree
-#--considering adding the -- feature
-#....
-#....
-
-#On the level i, I added feature 4 to current set ( the best feature)
-
-#On the i + 1 level of the search tree, with current set
-#--Considering adding the 1 feature
-#(Consider all other feature expect the one that's not on the current set)
-
-
-#On the level i+1, I added {best feature} to the current set ...
-
-#MATLAB CODE
-
-"""
-function accuracy = leave_one_out_cross_validation(data, current_set, feature_to_add)
-    accuracy = rand;
-end
-
-"""
-
 def leave_one_out_cross_validation(data, current_set, feature_to_add):
 
     data_copy = data.copy()
@@ -68,27 +45,6 @@ def leave_one_out_cross_validation(data, current_set, feature_to_add):
 
     return accuracy
 
-
-
-
-
-
-#Search feature
-
-'''
-function feature_search_demo(data) 
-
-for i 1: size(data,2) -1 
-    disp(['On the ',num2str(i),'
-
-'''
-
-# def num2str(num):
-
-
-
-
-
 def forward_feature_search(data):
     print("Beginning search. ")
 
@@ -130,11 +86,14 @@ def forward_feature_search(data):
 
 
 
+
+
         current_set.add(feature_to_add_at_this_level)                   #Add the best feature to current_set
         print(f"Feature set {sorted(current_set)} was the best, accuracy is {round(best_accuracy*100,2)}%")                  #Print the best found features at this level
         if not i == data.shape[1] - 1 :
             if best_accuracy < best_accuracy_of_program:
                 print(f"Warning, Accuracy has decreased! Continuing search in case of local maxima")
+        print()
 
     print(f"Finished search!! The best feature subset is {sorted(best_accuracy_feature_set)} , which has an accuracy of {round(best_accuracy_of_program*100,2)}%")
 
@@ -195,15 +154,8 @@ def backward_feature_search(data):
         if not i == data.shape[1] - 1:
             if best_accuracy < best_accuracy_of_program:
                 print(f"Warning, Accuracy has decreased! Continuing search in case of local maxima")
-
+        print()
     print(f"Finished search!! The best feature subset is {sorted(best_accuracy_feature_set)} , which has an accuracy of {round(best_accuracy_of_program*100, 2)}%")
-
-    
-
-
-
-    
-
 
 def main():
     print("Welcome to Feature Search Algorithm.")   
@@ -228,15 +180,6 @@ def main():
     end_time = time.time()
 
     print(f"Time taken to run the algorithm is: {round(end_time - start_time,2)} seconds.")
-
-
-
-
-
-
-
-
-
 
 if __name__ == '__main__':
     main()
