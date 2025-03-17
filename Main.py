@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 
 # On the ith level of the search tree
@@ -112,7 +114,7 @@ def forward_feature_search(data):
                 feature_used.add(j)
 
 
-                print(f"Using feature(s) {sorted(feature_used)} accuracy is {accuracy}%")     #Print what features are being used
+                print(f"Using feature(s) {sorted(feature_used)} accuracy is {round(accuracy*100,2)}%")     #Print what features are being used
 
                 # Checking best feature at this level
                 if accuracy > best_accuracy:
@@ -125,31 +127,107 @@ def forward_feature_search(data):
                     best_accuracy_feature_set = current_set.copy()
                     best_accuracy_feature_set.add(j)
 
-                # Checks if the accuracy decreased with added feature
-                if accuracy < best_accuracy_of_program:
-                    print(f"Warning, Accuracy has decreased! Continuing search in case of local maxima")
+
 
 
         current_set.add(feature_to_add_at_this_level)                   #Add the best feature to current_set
-        print(f"Feature set {sorted(current_set)} was the best, accuracy is {best_accuracy}%")                  #Print the best found features at this level
+        print(f"Feature set {sorted(current_set)} was the best, accuracy is {round(best_accuracy*100,2)}%")                  #Print the best found features at this level
+        if not i == data.shape[1] - 1 :
+            if best_accuracy < best_accuracy_of_program:
+                print(f"Warning, Accuracy has decreased! Continuing search in case of local maxima")
 
-    print(f"Finished search!! The best feature subset is {sorted(best_accuracy_feature_set)} , which has an accuracy of {best_accuracy_of_program}%")
+    print(f"Finished search!! The best feature subset is {sorted(best_accuracy_feature_set)} , which has an accuracy of {round(best_accuracy_of_program*100,2)}%")
 
+def backward_feature_search(data):
+    
+    best_accuracy_feature_set = set()               #Keep track of the best found feature set
+    best_accuracy_of_program = 0                    #Keep track of the best accuracy of the program
+    current_set = set()                             #Set of features as we keep on removing features
+
+    not_first_run = False                           #Not remove any element in the first run
+
+    #Mutate the current set with all the features
+    for k in range(1, data.shape[1]):
+        current_set.add(k)
+
+
+    for i in range(1, data.shape[1]): #shape return row and column
+        previous_run = set()                        #Not print multiple times for first run
+
+        best_accuracy = 0                           #Keep track of the best accuracy at each level
+        feature_set_to_keep = set()                 #Best feature set to keep
+
+        for j in range(1, data.shape[1]):
+
+            feature_to_use = current_set.copy()     #List of feature to test
+
+            # Only remove and test the elements if they are present in current search
+            if j in feature_to_use:
+
+                # Testing different removals of features
+                if j in feature_to_use and not_first_run:
+                    feature_to_use.remove(j)
+
+                accuracy = leave_one_out_cross_validation(data, feature_to_use, None)       #Accuracy of feature set being tested
+
+                if not previous_run == feature_to_use:
+                    print(f"Using feature(s) {sorted(feature_to_use)} accuracy is {round(accuracy*100,2)}%")     #Print what features are being used
+
+                # Checking best feature at this level
+                if accuracy > best_accuracy:
+                    best_accuracy = accuracy
+                    feature_set_to_keep = feature_to_use.copy()
+
+                # Checking if this is the best set of features
+                if best_accuracy_of_program < accuracy:
+                    best_accuracy_of_program = accuracy
+                    best_accuracy_feature_set = feature_to_use.copy()
+
+
+                previous_run = feature_to_use.copy()
+
+        current_set = feature_set_to_keep.copy()            #Replacing the best feature set after removal to current set
+        not_first_run = True
+
+        print(f"Feature set {sorted(feature_set_to_keep)} was the best, accuracy is {round(best_accuracy*100, 2)}%")                  #Print the best found features at this level
+
+        # Checks if the accuracy decreased with new feature set
+        if not i == data.shape[1] - 1:
+            if best_accuracy < best_accuracy_of_program:
+                print(f"Warning, Accuracy has decreased! Continuing search in case of local maxima")
+
+    print(f"Finished search!! The best feature subset is {sorted(best_accuracy_feature_set)} , which has an accuracy of {round(best_accuracy_of_program*100, 2)}%")
+
+    
+
+
+
+    
 
 
 def main():
-    print("Welcome to Feature Search Algorithm.")
-    inputFile = "/Users/eros/Library/Mobile Documents/com~apple~CloudDocs/project_2/CS170_Large_Data__92.txt"
+    print("Welcome to Feature Search Algorithm.")   
+    inputFile = "CS170_Small_Data__7.txt"
     print()
-    algorithm_type = input("Type the number of the algorithm you want to run.")
-    print()
+
     print("     1)Forward Selection")
     print("     2)Backward Selection")
+    
+    algorithm_type = input("Type the number of the algorithm you want to run. ")
+    print()
 
     data = np.loadtxt(inputFile)
 
+    start_time = time.time()
     if algorithm_type == "1":
         forward_feature_search(data)
+
+    if algorithm_type == "2":
+        backward_feature_search(data)
+
+    end_time = time.time()
+
+    print(f"Time taken to run the algorithm is: {round(end_time - start_time,2)} seconds.")
 
 
 
